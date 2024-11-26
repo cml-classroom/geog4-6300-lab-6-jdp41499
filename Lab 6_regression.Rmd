@@ -48,71 +48,122 @@ We will start by looking at data for 2020.
 **Question 1** _Create histograms for NDVI, max temp., min temp., rain, and population, and water in 2020 as well as elevation. Based on these graphs, assess the normality of these variables._
 
 ```{r}
-#Code goes here.
+ggplot(lab6_data,aes(x=ndvi_20_med)) + geom_histogram()
+ggplot(lab6_data,aes(x=maxtemp_20_med)) + geom_histogram()
+ggplot(lab6_data,aes(x=mintemp_20_med)) + geom_histogram()
+ggplot(lab6_data,aes(x=rain_20_sum)) + geom_histogram()
+ggplot(lab6_data,aes(x=pop_20)) + geom_histogram()
+ggplot(lab6_data,aes(x=water_20_pct)) + geom_histogram()
+
 ```
 
-{Your assessment of the variables' normality goes here.}
+ndvi: right skewed
+max temp: left skewed
+min temp: close to normal, a little left skewed
+rain: right skewed
+population: right skewed
+water: right skewed
 
 **Question 2** _Use tmap to map these same variables using Jenks natural breaks as the classification method. For an extra challenge, use `tmap_arrange` to plot all maps in a single figure._
 
 ```{r}
+library(tmap)
 
+map1<-tm_shape(lab6_data)+tm_polygons("ndvi_20_med", style = "jenks")
+map2<-tm_shape(lab6_data)+tm_polygons("maxtemp_20_med", style = "jenks")
+map3<-tm_shape(lab6_data)+tm_polygons("mintemp_20_med", style = "jenks")
+map4<-tm_shape(lab6_data)+tm_polygons("rain_20_sum", style = "jenks")
+map5<-tm_shape(lab6_data)+tm_polygons("pop_20", style = "jenks")
+map6<-tm_shape(lab6_data)+tm_polygons("water_20_pct", style = "jenks")
+
+tmap_arrange(map1, map2, map3, map4, map5, map6, ncol=3, nrow=2)
 ```
 
 
 **Question 3** _Based on the maps from question 3, summarise major patterns you see in the spatial distribution of these data from any of your variables of interest. How do they appear to be associated with the NDVI variable?_
 
-{Your response here.}
+Maxtemp_20_med and mintemp_20,med appear to be negatively associated with ndvi, while rain_20_sum and pop_20 appear to be positively associated with ndvi. Water_20_pct does not appear to have any association with ndvi, since the patterns do not match positively or negatively.
 
 **Question 4** _Create univariate models for each of the variables listed in question 1, with NDVI in 2020 as the dependent variable. Print a summary of each model. Write a summary of those results that indicates the direction, magnitude, and significance for each model coefficient._
 
 ```{r}
+model1<-lm(ndvi_20_med~maxtemp_20_med, data=lab6_data)
+summary(model1)
 
+model2<-lm(ndvi_20_med~mintemp_20_med, data=lab6_data)
+summary(model2)
+
+model3<-lm(ndvi_20_med~rain_20_sum, data=lab6_data)
+summary(model3)
+
+model4<-lm(ndvi_20_med~pop_20, data=lab6_data)
+summary(model4)
+
+model5<-lm(ndvi_20_med~water_20_pct, data=lab6_data)
+summary(model5)
 ```
 
-{Discussion here}
+The first model with the maxtemp_20_med variable has an estimate of -0.01, which indicates that as maxtemp_20_med increases by 1, then ndvi decreases by 0.01. The p value is about 0, which indicates a high significance.
+
+The second model with the mintemp_20_med variable has an estimate of -0.01, which indicates that as mintemp_20_med increases by 1, then ndvi decreases by 0.01. The p value is about 0, which indicates a high significance.
+
+The third model with the rain_20_sum variable has an estimate of 0.0000009, which indicates that as rain_20_sum increases by 1, then ndvi remains about constant (minuscule increase of 0.0000009). The p value is about 0, which indicates a high significance.
+
+The fourth model with the pop_20 variable has an estimate of 0.000001, which indicates that as pop_20 increases by 1, then ndvi remains about constant (minuscule increase of 0.000001). The p value is about 0, which indicates a high significance.
+
+The fifth model with the water_20_pct variable has an estimate of 0.000001, which indicates that as water_20_pct increases by 1, then ndvi remains about constant (minuscule increase of 0.000001). The p value is about 0.249, which indicates a low significance.
 
 **Question 5** _Create a multivariate regression model with the variables of interest, choosing EITHER max or min temperature (but not both) You may also choose to leave out any variables that were insignificant in Q4. Use the univariate models as your guide. Call the results._
 
 ```{r}
-#Code goes here
+multi_model<-lm(ndvi_20_med~maxtemp_20_med+rain_20_sum+pop_20, data=lab6_data)
+summary(multi_model)
 ```
 
 **Question 6** _Summarize the results of the multivariate model. What are the direction, magnitude, and significance of each coefficient? How did it change from the univariate models you created in Q4 (if at all)? What do the R2 and F-statistic values tell you about overall model fit?_
 
-{Response goes here}
+The first coefficient with the maxtemp_20_med variable has an estimate of about -0.02, which indicates that as maxtemp_20_med increases by 1, then ndvi decreases by about -0.02. The p value is about 0, which indicates a high significance.
+
+The second coefficient with the rain_20_sum variable has an estimate of about 0.0000008, which indicates that as rain_20_sum increases by 1, then ndvi remains about constant (minuscule increase of 0.0000008). The p value is about 0, which indicates a high significance.
+
+The second coefficient with the pop_20 variable has an estimate of about 0.0000003, which indicates that as pop_20 increases by 1, then ndvi remains about constant (minuscule increase of 0.0000003). The p value is about 0.005, which indicates a fairly high significance.
+
+The values did not change much from the univariate models above. The R^2 value of about 0.61 says that about 61% of the ndvi variation is explained by the model. The F-statistic p value of about zero shows that the model shows a large percentage of the variation, making it a fairly useful model.
 
 **Question 7** _Use a histogram and a map to assess the normality of residuals and any spatial autocorrelation. Summarise any notable patterns that you see._
 
 ```{r}
-#Code goes here
+hist(residuals(multi_model))
+
+lab6_data$residuals<-residuals(multi_model)
+tm_shape(lab6_data)+tm_polygons("residuals")
 ```
 
-{Summary goes here}
+The histogram indicates that the residuals are about normally distributed, with a small group residuals less than -0.2. The map indicates that all residuals are near the coasts of the Australian continent, with none being in the interior part.
 
 **Question 8** _Assess any issues with multicollinearity or heteroskedastity in this model using the techniques shown in class. Run the appropriate tests and explain what their results show you._
 
 ```{r}
-#Code goes here
+library(lmtest)
+library(car)
+
+bptest(multi_model)
+vif(multi_model)
 ```
 
-{Interpretation goes here}
+Since the p-value for the bptest is about 0, we can reject the null hypothesis, suggesting there is heteroskedasticity. The vif test produces all values below 5, suggesting there is no multicollinearity.
 
 **Question 9** _How would you summarise the results of this model in a sentence or two? In addition, looking at the full model and your diagnostics, do you feel this is a model that provides meaningful results? Explain your answer._
 
-```{r}
-Discussion here
-```
-
+Overall, the model is somewhat useful. It captures the majority (61%) of the residuals and has three significant variables. However, 39% of the variation is not explained plus there is evidence of heteroskedasticity.
 
 **Disclosure of assistance:** _Besides class materials, what other sources of assistance did you use while completing this lab? These can include input from classmates, relevant material identified through web searches (e.g., Stack Overflow), or assistance from ChatGPT or other AI tools. How did these sources support your own learning in completing this lab?_
 
-{Response here.}
+I used ChatGPT to conceptually understand several of these tests I performed. I tried to understand what the values meant and what to look for in the outputs.
 
 **Lab reflection:** _How do you feel about the work you did on this lab? Was it easy, moderate, or hard? What were the biggest things you learned by completing it?_
 
-{Discussion here.}
-
+Overall, this lab was moderately difficult. The coding part of it was pretty easy, but conceptually understanding all of the tests and what they did was a little tricky.
 
 **Challenge question**
 
@@ -130,6 +181,16 @@ Create a first difference model. To do that, subtract the values in 2000 from th
 The animal data included in this dataset is an example of count data, and usually we would use a Poisson or similar model for that purpose. Let's try it with regular OLS regression though. Create two regression models to assess how the counts of two different animals (say, koalas and emus) are associated with at least three of the environmental/climatological variables given above. Be sure to use the same independent variables in each model. Interpret the results of each model and then explain the importance of any differences in the model coefficients between them, focusing on direction, magnitude, and significance.
 
 ```{r}
+emu_model<-lm(Common.emu~maxtemp_20_med+rain_20_sum+water_20_pct, data=lab6_data)
+summary(emu_model)
 
+wombat_model<-lm(Wombat~maxtemp_20_med+rain_20_sum+water_20_pct, data=lab6_data)
+summary(wombat_model)
 ```
+
+For the emu model, the maxtemp_20_med was significant, with an coefficient of about -2.33. This means that as maxtemp_20_med increases by 1, emu count decreases by 2.33. This was the only significant variable. The R squared value was 0.09, suggesting that the vast majority of residuals were not explained by the model.
+
+For the wombat model, the maxtemp_20_med was significant, with an coefficient of about -4.34. This means that as maxtemp_20_med increases by 1, wombat count decreases by 4.34. The rain_20_sum was also significant, with an coefficient of about 0.0002. This means that as rain_20_sum increases by 1, wombat count increases by 0.0002. The other variable was not significant. The R squared value was 0.15, suggesting that the vast majority of residuals were not explained by the model.
+
+Overall, neither model was very good. Both had extremely low R squared values and had statistically insignificant variables. Better models could be found for these animals.
 
