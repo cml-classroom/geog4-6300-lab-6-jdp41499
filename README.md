@@ -8,9 +8,9 @@ Complete the lab assignment by filling in the template. Knit it to a Github docu
 * Question 4:Well explained.<p>
 * Question 5:Excellent. <p>
 * Question 6:Nicely explained.<p>
-* Question 7:The histogram does not indicate that the residuals are normally distributed; instead, it suggests that they are left-skewed.<p>
+* Question 7:I wouldn't call that normally distributed.<p>
 * Question 8:Correct.<p>
 * Question 9:This works!<p>
 * Challenge:Great work.<p>
 <p>
-General feedback:You performed excellently throughout the lab. However, to mark it complete, please check my comment on question 7.
+General feedback: You performed excellently throughout the lab--except for Q7. We will still mark it as complete.
